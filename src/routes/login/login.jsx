@@ -1,12 +1,13 @@
 import "./login.scss";
 import apiRequest from "../../lib/apiRequest.js"
 import { Link, useNavigate } from "react-router-dom";
-import {useState} from "react"
+import {useContext, useState} from "react"
+import {AuthContext} from "../../context/AuthContext"
 
 function Login() {
   const [error, setError]=useState("")
   const [isLoading, setIsLoading]=useState(false)
-
+  const {updateUser} = useContext(AuthContext)
   const navigate=useNavigate()
 
   const handleSubmit = async (e) => {
@@ -21,7 +22,8 @@ function Login() {
       const res = await apiRequest.post("/auth/login", {
         username, password
       })
-    localStorage.setItem("user", JSON.stringify(res.data))
+    // localStorage.setItem("user", JSON.stringify(res.data))
+    updateUser(res.data)
     navigate("/")
     } catch (err) {
       console.log(err);
