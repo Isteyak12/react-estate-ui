@@ -1,29 +1,36 @@
-import { useContext, useState } from "react"
+import { useContext, useState } from "react";
 import "./profileUpdatePage.scss";
-import { AuthContext } from "../../context/AuthContext"
-import apiRequest from "../../lib/apiRequest"
+import { AuthContext } from "../../context/AuthContext";
+import apiRequest from "../../lib/apiRequest";
+import { useNavigate } from "react-router-dom";
+import UploadWidget from "../../components/uploadWidget/UploadWidget";
 
 function ProfileUpdatePage() {
-  const [error, setError] = useState("")
-  const { currentUser, updateUser } = useContext(AuthContext)
+  const { currentUser, updateUser } = useContext(AuthContext);
+  const [error, setError] = useState("");
+  const [avatar, setAvatar] = useState([]); // State for the avatar URL
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    const formData = new FormData(e.target)
-    const { username, email, password } = Object.fromEntries(formData)
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const { username, email, password } = Object.fromEntries(formData);
+
     try {
-      const res=apiRequest.put(`/users/${currentUser.id}`, {username, email, password})
-      updateUser(res.data)
-      console.log(res.data)
+      const res = await apiRequest.put(`/users/${currentUser.id}`, {
+        username,
+        email,
+        password,
+        avatar: avatar[0],  // Ensure avatar is passed correctly
+      });
+      updateUser(res.data);
+      navigate("/profile");
     } catch (err) {
-      console.log(err)
-      setError(err.response.data.message)
+      console.error("Error updating user:", err);  // Log error details
+      setError(err.response?.data?.message || "Failed to update user!");
     }
-
   };
-
-
-
 
   return (
     <div className="profileUpdatePage">
@@ -53,11 +60,25 @@ function ProfileUpdatePage() {
             <input id="password" name="password" type="password" />
           </div>
           <button>Update</button>
-          {error && <span>error</span>}
+          {error && <span>{error}</span>}
         </form>
       </div>
       <div className="sideContainer">
-        <img src={currentUser.avatar || "/noavatar.jpeg"} alt="" className="avatar" />
+        <img
+          src={avatar[0] || currentUser.avatar || "/noavatar.jpeg"}
+          alt="User avatar"
+          className="avatar"
+        />
+        <UploadWidget
+          uwConfig={{
+            cloudName: "lamadev",
+            uploadPreset: "estate",
+            multiple: false,
+            maxImageFileSize: 2000000,
+            folder: "avatars",
+          }}
+          setAvatar={setAvatar}  // Pass setAvatar to UploadWidget
+        />
       </div>
     </div>
   );
