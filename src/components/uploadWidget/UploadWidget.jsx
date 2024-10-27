@@ -3,7 +3,7 @@ import { createContext, useEffect, useState } from "react";
 // Create a context to manage the script loading state
 const CloudinaryScriptContext = createContext();
 
-function UploadWidget({ uwConfig, setAvatar }) {
+function UploadWidget({ uwConfig, setPublicId, setState }) {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ function UploadWidget({ uwConfig, setAvatar }) {
           if (!error && result && result.event === "success") {
             console.log("Uploaded image info:", result.info); // Debug log
             // Update avatar state with the uploaded image URL
-            setAvatar([result.info.secure_url]);
+            setState(prev=>[...prev, result.info.secure_url])
           }
         }
       );

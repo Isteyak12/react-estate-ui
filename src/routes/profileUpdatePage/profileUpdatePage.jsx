@@ -77,7 +77,7 @@ function ProfileUpdatePage() {
             maxImageFileSize: 2000000,
             folder: "avatars",
           }}
-          setAvatar={setAvatar}  // Pass setAvatar to UploadWidget
+          setState={setAvatar}  // Pass setAvatar to UploadWidget
         />
       </div>
     </div>
